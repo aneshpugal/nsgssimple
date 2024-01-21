@@ -51,7 +51,7 @@
                 "tier": "Basic",
                 "size": "B1"
             },
-            "kind": "linux",
+            "kind": "serverfarm",
             "properties": {
                 "perSiteScaling": false,
                 "maximumElasticWorkerCount": 1,
@@ -120,10 +120,6 @@
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('funcStorageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('funcStorageName')),'2019-06-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionName'))]"
                         },                         
                         {
                             "name": "FUNCTION_APP_EDIT_MODE",
