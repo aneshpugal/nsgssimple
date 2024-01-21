@@ -2,9 +2,9 @@ import logging,os
 import azure.functions as func
 from azure.storage.blob import BlobServiceClient
 from azure.data.tables import TableServiceClient
-from logger import configure_logging
-from BlobForwarder import BlobDetails,Checkpoint,blob_Sender
-from datetime import datetime
+# from logger import configure_logging
+# from BlobForwarder import BlobDetails,Checkpoint,blob_Sender
+# from datetime import datetime
 
 blob_connection_string = os.environ["blobconnectionstring"]
 table_connection_string = os.environ["AzureWebJobsStorage"]
