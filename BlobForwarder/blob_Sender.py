@@ -1,7 +1,6 @@
 import sys, os, re, gzip, json, urllib.parse, urllib.request, traceback, datetime, calendar, logging, hashlib, ast
 from base64 import b64decode
 from BlobForwarder import nsgParser
-from BlobForwarder.logger import logger
 logtype_config = None
 s247_datetime_format_string = None
 serviceName = ""
@@ -177,9 +176,9 @@ def send_logs_to_s247(gzipped_parsed_lines, log_size):
     s247_response = urllib.request.urlopen(request, data=gzipped_parsed_lines)
     dict_responseHeaders = dict(s247_response.getheaders())
     if s247_response and s247_response.status == 200:
-        logger.info('%s :All logs are uploaded to site24x7', dict_responseHeaders['x-uploadid'])
+        logging.info('%s :All logs are uploaded to site24x7', dict_responseHeaders['x-uploadid'])
     else:
-        logger.info('%s :Problem in uploading to site24x7 status %s, Reason : %s', dict_responseHeaders['x-uploadid'], s247_response.status, s247_response.read())
+        logging.info('%s :Problem in uploading to site24x7 status %s, Reason : %s', dict_responseHeaders['x-uploadid'], s247_response.status, s247_response.read())
 
 def processData(logRecords,service):
     try:
