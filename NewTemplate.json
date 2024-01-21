@@ -1,0 +1,163 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "defaultValue": "Site24x7AzureNSGLogs",
+            "type": "string"
+        },
+        "blobconnectionstring": {
+            "type": "string",
+            "metadata": {
+                "description" : "Enter the connection string from which you wish to collect logs from."
+            }
+        },
+        "logTypeConfig": {
+            "type": "string",
+            "defaultValue": "eyJsb2dUeXBlIjoiYXp1cmVuc2dsb2dzIiwiYXBpS2V5IjoidXNfYTUxMTg0ZTZlYWQyMjZjODA2ZGZhMzMzM2M1Y2UxYWQiLCJkYXRlRm9ybWF0IjoiJVktJW0tJWQgJUg6JU06JVMiLCJkYXRlUmVnZXgiOiIyMFswLTldezJ9XFwtWzAtOV17MSwyfVxcLShcXHNbMS05XXxcXGR7MSwyfSlcXHNbMC05XXsxLDJ9XFw6WzAtOV17MSwyfVxcOlswLTldezEsMn0iLCJ1cGxvYWREb21haW4iOiJsb2djLnNpdGUyNHg3LmNvbSIsInRpbWV6b25lIjoiKzAwMDAiLCJkYXRlRmllbGQiOiJUaW1lIiwianNvblBhdGgiOlt7Im5hbWUiOiJUaW1lIn0seyJuYW1lIjoiU3lzdGVtSWQifSx7Im5hbWUiOiJNYWNBZGRyZXNzIn0seyJuYW1lIjoiUmVzb3VyY2VDYXRlZ29yeSJ9LHsibmFtZSI6IlJlc291cmNlSWQifSx7Im5hbWUiOiJPcGVyYXRpb25OYW1lIn0seyJuYW1lIjoiVmVyc2lvbiJ9LHsibmFtZSI6IlJ1bGUifSx7Im5hbWUiOiJTb3VyY2VJUCJ9LHsibmFtZSI6IkRlc3RpbmF0aW9uSVAifSx7Im5hbWUiOiJTb3VyY2VQb3J0In0seyJuYW1lIjoiRGVzdGluYXRpb25Qb3J0In0seyJuYW1lIjoiUHJvdG9jb2wifSx7Im5hbWUiOiJUcmFmZmljRGVzdGluYXRpb24ifSx7Im5hbWUiOiJUcmFmZmljQWN0aW9uIn0seyJuYW1lIjoiUHJpb3JpdHkifSx7Im5hbWUiOiJCeXRlc1NlbnQifSx7Im5hbWUiOiJCeXRlc1JlY2VpdmVkIn0seyJuYW1lIjoiUGFja2V0c1NlbnQifSx7Im5hbWUiOiJQYWNrZXRzUmVjZWl2ZWQifV0sImZpbHRlckNvbmZpZyI6e319",
+            "metadata": {
+                "description" : "Enter the logTypeConfig value copied from Site24x7 Log profile page"
+            }
+        },
+        "CollectionTime": {
+            "type": "int",
+            "defaultValue": "[dateTimeToEpoch(utcNow())]",
+            "metadata": {
+                "description" : "Enter the epoch time from which you wish to collect logs from"
+            }
+        }
+    },
+    
+    "variables": {
+	    "suffix": "[substring(toLower(uniqueString(resourceGroup().id, resourceGroup().location)),0,5)]",
+	    "subscriptionid": "[subscription().subscriptionId]",
+        "location" :  "[resourceGroup().location]",
+        "linuxFxVersion" : "PYTHON|3.11",
+	    "funcStorageName": "[tolower(concat(substring(parameters('name'), 0, min(length(parameters('name')),16)), 'stg', variables('suffix')))]",
+        "functionName" : "[concat(parameters('name'), '-Function-', variables('suffix'))]",
+        "serverFarmName" : "[concat(parameters('name'), '-AppServicePlan-', variables('suffix'))]",
+        "RepoURL": "https://github.com/aneshpugal/nsgssimple.git",
+        "Branch": "main",
+        "RootManageSharedAccessKey_name" : "RootManageSharedAccessKey"
+     },
+    "resources": [
+	    {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('serverFarmName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1"
+            },
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+		{
+            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[ variables('funcStorageName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": false,
+		        "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "[variables('functionName')]",
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp,linux",
+            "location": "[variables('location')]",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts/',  variables('funcStorageName'))]"                
+            ],
+            "properties": {
+                "name": "[variables('functionName')]",
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
+                "reserved": false,
+                "httpsOnly": true,
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME", 
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION", 
+                            "value": "~4"
+                        },
+			            {
+                            "name": "logTypeConfig", 
+                            "value" : "[parameters('logTypeConfig')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('funcStorageName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('funcStorageName')),'2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(variables('functionName'))]"
+                        },                         
+                        {
+                            "name": "FUNCTION_APP_EDIT_MODE",
+                            "value": "readwrite"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('funcStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts',  variables('funcStorageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "blobconnectionstring",
+                            "value": "[parameters('blobconnectionstring')]"
+                        }
+                    ],
+                    "linuxFxVersion": "[variables('linuxFxVersion')]",
+                    "alwaysOn": true
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2020-06-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                      "[resourceId('Microsoft.Web/sites/', variables('functionName'))]"
+                    ],
+                    "properties": {
+                        "RepoUrl": "[variables('RepoURL')]",
+                        "branch": "[variables('Branch')]",
+                        "publishRunbook": true,
+                        "IsManualIntegration": true
+                    }
+               }
+            ]
+        }
+	]
+}
