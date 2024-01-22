@@ -31,8 +31,8 @@ def main(myblob: func.InputStream):
     try:
         logging.info(f"Python blob trigger function processed blob Name: {myblob.name}")
         current_time_str = myblob.blob_properties["LastModified"]
-        current_time = datetime.fromisoformat(current_time_str)
-        if current_time < int(timestamp):
+        current_time = datetime.fromisoformat(current_time_str).timestamp()
+        if int(current_time) < int(timestamp):
             return
         azure_logger = logging.getLogger("azure.core.pipeline.policies.http_logging_policy")
         azure_logger.setLevel(logging.WARNING)
