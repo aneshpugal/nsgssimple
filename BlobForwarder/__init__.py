@@ -22,7 +22,7 @@ except Exception as e:
     print(str(e))
 
 try:
-    timestamp = os.environ["CollectionTime"]
+    timestamp = os.environ["LogCollectionStartTime"]
 except Exception as e:
     print(str(e))
 

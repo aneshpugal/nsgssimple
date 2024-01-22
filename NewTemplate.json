@@ -19,7 +19,7 @@
                 "description" : "Enter the logTypeConfig value copied from Site24x7 Log profile page"
             }
         },
-        "CollectionTime": {
+        "LogCollectionStartTime": {
             "type": "int",
             "defaultValue": "[dateTimeToEpoch(utcNow())]",
             "metadata": {
@@ -132,6 +132,10 @@
                         {
                             "name": "blobconnectionstring",
                             "value": "[parameters('blobconnectionstring')]"
+                        },
+                        {
+                            "name": "LogCollectionStartTime",
+                            "value": "[parameters('LogCollectionStartTime')]"
                         }
                     ],
                     "linuxFxVersion": "[variables('linuxFxVersion')]",
