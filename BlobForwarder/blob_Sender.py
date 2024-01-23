@@ -149,6 +149,7 @@ def log_size_calculation(formatted_line):
     for field in formatted_line:
         if not field.startswith(data_exclusion):
             log_size += sys.getsizeof(str(formatted_line[field])) -49
+    return log_size
 
 def log_line_filter(formatted_line):
     if masking_config:
@@ -163,7 +164,7 @@ def log_line_filter(formatted_line):
         remove_ignored_fields()
     formatted_line['_zl_timestamp'] = get_timestamp(formatted_line[logtype_config['dateField']])
     formatted_line['s247agentuid'] = serviceName
-    log_size_calculation(formatted_line)
+    # log_size_calculation(formatted_line)
     log_size = log_size_calculation(formatted_line)
     return formatted_line,log_size
 
