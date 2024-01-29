@@ -18,4 +18,4 @@ You can configure an automated deployment by following the steps mentioned in th
 
 ### Architecture 
 
-![Architecture](https://github.com/aneshpugal/nsgssimple/tree/main/Images/EventHubs_Logs/Architecture.png?raw=true)
+![Architecture](https://github.com/aneshpugal/nsgssimple/blob/main/Images/EventHubs_Logs/Architecture.png?raw=true)
