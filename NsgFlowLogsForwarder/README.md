@@ -15,3 +15,7 @@ You can configure an automated deployment by following the steps mentioned in th
 | Blob connection string | Retrieve the connection string for the storage account where the NSG Flow logs are stored by following the steps mentioned in this [document](https://www.site24x7.com/help/log-management/). |
 | Log Type Config | Navigate to the Site24x7 web client, select **Admin > Applogs > Log Profile**, then select the created log profile, and copy the code that appears on the screen as the input for the variable logtypeConfig. |
 | Log Collection Start Time | Give collection time in Unix format (e.g., 1705989855). This setting determines when to collect logs. If no time is specified, it defaults to processing events created from the configuration time onward. |
+
+### Architecture 
+
+![Architecture](https://github.com/aneshpugal/nsgssimple/tree/main/Images/Architecture.png?raw=true)
