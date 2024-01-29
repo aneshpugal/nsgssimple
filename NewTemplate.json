@@ -7,7 +7,7 @@
             "type": "string"
         },
         "blobconnectionstring": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description" : "Enter the connection string from which you wish to collect logs from."
             }
